@@ -9,9 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
+
 
 @RestController()
-@RequestMapping("/socks")
+@RequestMapping(path = "/socks")
 @Tag(name = "Наименование товара - 'Носки'", description = "CRUD-операции для работы с товаром 'Носки'")
 public class SocksController {
 
@@ -21,12 +23,12 @@ public class SocksController {
         this.socksService = socksService;
     }
 
-    @PostMapping("/{socksColor}/{socksSize}/{cottonPart}/{quantity}")
+    @PostMapping("/post")
     @Operation(summary = "Добавление носков на склад")
-    public ResponseEntity<String> incoming(@PathVariable("socksColor") SocksColor socksColor,
-                                           @PathVariable("socksSize") SocksSize socksSize,
-                                           @PathVariable("cottonPart") int cottonPart,
-                                           @PathVariable("quantity") int quantity) {
+    public ResponseEntity<String> incoming(@PathParam("socksColor") SocksColor socksColor,
+                                           @PathParam("socksSize") SocksSize socksSize,
+                                           @PathParam("cottonPart") int cottonPart,
+                                           @PathParam("quantity") int quantity) {
         {
             if (socksService.addToStorage(socksColor, socksSize, cottonPart, quantity)) {
                 return ResponseEntity.status(HttpStatus.OK).body("Новая партия носков добавлена на склад");
@@ -36,11 +38,11 @@ public class SocksController {
         }
     }
 
-    @GetMapping("/{socksColor}/{socksSize}/{cottonMin}")
+    @GetMapping("/cotton/min")
     @Operation(summary = "Получение сведений о наличии товара на складе по содержанию хлопка меньше указанного")
-    public ResponseEntity<String> findCottonPartMin(@PathVariable("socksColor") SocksColor socksColor,
-                                                    @PathVariable("socksSize") SocksSize socksSize,
-                                                    @PathVariable("cottonMin") int cottonMin) {
+    public ResponseEntity<String> findCottonPartMin(@PathParam("socksColor") SocksColor socksColor,
+                                                    @PathParam("socksSize") SocksSize socksSize,
+                                                    @PathParam("cottonMin") int cottonMin) {
         int quantity = socksService.findByCottonPartLessThan(socksColor, socksSize, cottonMin);
         if (quantity > 0) {
             return ResponseEntity.ok().body("По Вашему запросу найдено " + quantity + " шт. товара");
@@ -49,11 +51,11 @@ public class SocksController {
         }
     }
 
-    @GetMapping("/{socksColor}/{socksSize}/{cottonMax}")
+    @GetMapping("/cotton/max")
     @Operation(summary = "Получение сведений о наличии товара на складе по содержанию хлопка больше указанного")
-    public ResponseEntity<String> findCottonPartMax(@PathVariable("socksColor") SocksColor socksColor,
-                                                    @PathVariable("socksSize") SocksSize socksSize,
-                                                    @PathVariable("cottonMax") int cottonMax) {
+    public ResponseEntity<String> findCottonPartMax(@PathParam("socksColor") SocksColor socksColor,
+                                                    @PathParam("socksSize") SocksSize socksSize,
+                                                    @PathParam("cottonMax") int cottonMax) {
         int quantity = socksService.findByCottonPartMoreThan(socksColor, socksSize, cottonMax);
         if (quantity > 0) {
             return ResponseEntity.ok().body("По Вашему запросу найдено " + quantity + " шт. товара");
@@ -63,12 +65,12 @@ public class SocksController {
         }
     }
 
-    @PutMapping("/{socksColor}/{socksSize}/{cottonPart}/{quantity}")
+    @PutMapping("/put")
     @Operation(summary = "Отпуск со склада партии товара (носков)")
-    public ResponseEntity<String> outgoing(@PathVariable("socksColor") SocksColor socksColor,
-                                           @PathVariable("socksSize") SocksSize socksSize,
-                                           @PathVariable("cottonPart") int cottonPart,
-                                           @PathVariable("quantity") int quantity) {
+    public ResponseEntity<String> outgoing(@PathParam("socksColor") SocksColor socksColor,
+                                           @PathParam("socksSize") SocksSize socksSize,
+                                           @PathParam("cottonPart") int cottonPart,
+                                           @PathParam("quantity") int quantity) {
         if (socksService.releaseFromStorage(socksColor, socksSize, cottonPart, quantity)) {
             return ResponseEntity.ok().body("Товар отправлен со склада.");
         }
@@ -76,12 +78,12 @@ public class SocksController {
                 .body("Товар не отправлен. Недостаточное количество товара или полное отсутствие!");
     }
 
-    @DeleteMapping("/{socksColor}/{socksSize}/{cottonPart}/{quantity}")
+    @DeleteMapping("/delete")
     @Operation(summary = "Удаление бракованной партии товара (носков)")
-    public ResponseEntity<String> cancellation(@PathVariable("socksColor") SocksColor socksColor,
-                                               @PathVariable("socksSize") SocksSize socksSize,
-                                               @PathVariable("cottonPart") int cottonPart,
-                                               @PathVariable("quantity") int quantity) {
+    public ResponseEntity<String> cancellation(@PathParam("socksColor") SocksColor socksColor,
+                                               @PathParam("socksSize") SocksSize socksSize,
+                                               @PathParam("cottonPart") int cottonPart,
+                                               @PathParam("quantity") int quantity) {
         if (socksService.delete(socksColor, socksSize, cottonPart, quantity)) {
             return ResponseEntity.ok().body("Бракованный товар списан со склада.");
         }

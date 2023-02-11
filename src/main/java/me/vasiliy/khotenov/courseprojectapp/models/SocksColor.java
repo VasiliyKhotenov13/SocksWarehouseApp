@@ -1,5 +1,7 @@
 package me.vasiliy.khotenov.courseprojectapp.models;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum SocksColor {
 
     BLACK("чёрный"),
@@ -14,6 +16,8 @@ public enum SocksColor {
     SocksColor(String color) {
         this.color = color;
     }
+
+    @JsonValue
     public String getColor() {
         return color;
     }
